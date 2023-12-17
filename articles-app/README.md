@@ -18,8 +18,10 @@ go get github.com/gofor-little/env
 
 ### TABLES
 
+Create tables that are required for this application:
+
 ```sql
-CREATE TABLE users_1 (
+CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -30,7 +32,7 @@ CREATE TABLE users_1 (
 ```
 
 ```sql
-CREATE TABLE articles_1 (
+CREATE TABLE articles (
     id BIGSERIAL PRIMARY KEY,
     slug VARCHAR(120) NOT NULL UNIQUE,
     title VARCHAR(120) NOT NULL,
@@ -42,7 +44,12 @@ CREATE TABLE articles_1 (
 );
 ```
 
+NOTE: we are not using the users table but it's built in a way that we can easily add user authentication in this app.
+
 ### RUNNING THE APPLICATION
+
+Create a **.env** from **.env.example** in the project directory and add your database credentials.
+Start the application with **go run** command:
 
 ```bash
     go run main.go
