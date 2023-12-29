@@ -44,7 +44,7 @@ func GetDBConfig() *DBConfig {
 func GetJWTConfig() *JWTConfig {
 	return &JWTConfig{
 		Secret: Get("JWT_SECRET", "secret"),
-		Expiry: Get("JWT_EXPIRY", ""), // @TODO: use expiry from JWT
+		Expiry: Get("JWT_EXPIRY", ""), // @TODO: use expiry from ENV
 	}
 }
 

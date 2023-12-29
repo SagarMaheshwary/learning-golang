@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/sagarmaheshwary/learning-golang/articles-app-with-jwt/config"
 	"github.com/sagarmaheshwary/learning-golang/articles-app-with-jwt/database"
 	"github.com/sagarmaheshwary/learning-golang/articles-app-with-jwt/model"
@@ -24,14 +24,16 @@ func Register(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&registerInput); err != nil {
 		fmt.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Unable to parse input."})
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"message": "Unable to parse input."})
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(registerInput.Password), bcrypt.DefaultCost)
 
 	if err != nil {
 		fmt.Println(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Unable to hash password."})
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"message": "Unable to hash password."})
 	}
 
 	user.Email = registerInput.Email
@@ -41,21 +43,25 @@ func Register(c *fiber.Ctx) error {
 	result := database.DB.Create(&user)
 
 	if result.Error != nil {
-		fmt.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Email already exists."})
+		fmt.Println(result.Error)
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"message": "Email already exists."})
 	}
 
 	token, err := createToken(user.Id, user.Email)
 
 	if err != nil {
 		fmt.Println(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Server error."})
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"message": "Server error."})
 	}
 
 	return c.JSON(fiber.Map{
 		"message": "Registration successful.",
-		"user":    user,
-		"token":   token,
+		"data": fiber.Map{
+			"user":  user,
+			"token": token,
+		},
 	})
 }
 
@@ -69,7 +75,8 @@ func Login(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&loginInput); err != nil {
 		fmt.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid input."})
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"message": "Invalid input."})
 	}
 
 	user := new(model.User)
@@ -80,34 +87,51 @@ func Login(c *fiber.Ctx) error {
 
 	if err != nil {
 		fmt.Println(err)
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Invalid credentials."})
+		return c.Status(fiber.StatusUnauthorized).
+			JSON(fiber.Map{"message": "Invalid credentials."})
 	}
 
 	token, err := createToken(user.Id, user.Email)
 
 	if err != nil {
 		fmt.Println(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Server error."})
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"message": "Server error."})
 	}
 
 	return c.JSON(fiber.Map{
 		"message": "Login successful.",
-		"user":    user,
-		"token":   token,
+		"data": fiber.Map{
+			"user":  user,
+			"token": token,
+		},
 	})
 }
 
 func UserProfile(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "User Profile API"})
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+
+	user := new(model.User)
+	database.DB.First(&user, claims["user_id"])
+
+	return c.JSON(fiber.Map{
+		"message": "User Profile API",
+		"data": fiber.Map{
+			"user": user,
+		},
+	})
 }
 
 func createToken(id uint, username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
+	jwtKey := config.GetJWTConfig().Secret
+
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = username
 	claims["user_id"] = id
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix() // @TODO: use expiry from JWT
+	claims["exp"] = time.Now().Add(time.Hour / 72).Unix() // @TODO: use expiry from JWT Config
 
-	return token.SignedString([]byte(config.GetJWTConfig().Secret))
+	return token.SignedString([]byte(jwtKey))
 }
