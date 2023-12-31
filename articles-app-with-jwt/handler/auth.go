@@ -13,31 +13,37 @@ import (
 )
 
 func Register(c *fiber.Ctx) error {
-	type RegisterInput struct {
+	type RequestBody struct {
 		Name     string
 		Email    string
 		Password string
 	}
 
-	registerInput := new(RegisterInput)
+	requestBody := new(RequestBody)
 	user := new(model.User)
 
-	if err := c.BodyParser(&registerInput); err != nil {
+	if err := c.BodyParser(&requestBody); err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusBadRequest).
-			JSON(fiber.Map{"message": "Unable to parse input."})
+			JSON(fiber.Map{
+				"message": "Invalid request.",
+				"data":    nil,
+			})
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(registerInput.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(requestBody.Password), bcrypt.DefaultCost)
 
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusInternalServerError).
-			JSON(fiber.Map{"message": "Unable to hash password."})
+			JSON(fiber.Map{
+				"message": "Server error.",
+				"data":    nil,
+			})
 	}
 
-	user.Email = registerInput.Email
-	user.Name = registerInput.Name
+	user.Email = requestBody.Email
+	user.Name = requestBody.Name
 	user.Password = string(hashedPassword)
 
 	result := database.DB.Create(&user)
@@ -45,7 +51,10 @@ func Register(c *fiber.Ctx) error {
 	if result.Error != nil {
 		fmt.Println(result.Error)
 		return c.Status(fiber.StatusBadRequest).
-			JSON(fiber.Map{"message": "Email already exists."})
+			JSON(fiber.Map{
+				"message": "Email already exists.",
+				"data":    nil,
+			})
 	}
 
 	token, err := createToken(user.Id, user.Email)
@@ -53,7 +62,10 @@ func Register(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusInternalServerError).
-			JSON(fiber.Map{"message": "Server error."})
+			JSON(fiber.Map{
+				"message": "Server error.",
+				"data":    nil,
+			})
 	}
 
 	return c.JSON(fiber.Map{
@@ -66,29 +78,35 @@ func Register(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-	type LoginInput struct {
+	type RequestBody struct {
 		Email    string
 		Password string
 	}
 
-	loginInput := new(LoginInput)
+	requestBody := new(RequestBody)
 
-	if err := c.BodyParser(&loginInput); err != nil {
+	if err := c.BodyParser(&requestBody); err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusBadRequest).
-			JSON(fiber.Map{"message": "Invalid input."})
+			JSON(fiber.Map{
+				"message": "Invalid request.",
+				"data":    nil,
+			})
 	}
 
 	user := new(model.User)
 
-	database.DB.Where("email = ?", loginInput.Email).Find(&user)
+	database.DB.Where("email = ?", requestBody.Email).Find(&user)
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginInput.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))
 
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusUnauthorized).
-			JSON(fiber.Map{"message": "Invalid credentials."})
+			JSON(fiber.Map{
+				"message": "Invalid credentials.",
+				"data":    nil,
+			})
 	}
 
 	token, err := createToken(user.Id, user.Email)
@@ -131,7 +149,7 @@ func createToken(id uint, username string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = username
 	claims["user_id"] = id
-	claims["exp"] = time.Now().Add(time.Hour / 72).Unix() // @TODO: use expiry from JWT Config
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix() // @TODO: use expiry from JWT Config
 
 	return token.SignedString([]byte(jwtKey))
 }
