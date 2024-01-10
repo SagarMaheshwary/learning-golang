@@ -2,11 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/sagarmaheshwary/learning-golang/articles-app-with-jwt/database"
+	"github.com/sagarmaheshwary/learning-golang/articles-app-with-jwt/helpers"
 	"github.com/sagarmaheshwary/learning-golang/articles-app-with-jwt/model"
 )
 
@@ -42,14 +41,11 @@ func StoreArticle(c *fiber.Ctx) error {
 
 	article := new(model.Article)
 
-	article.Slug = strings.ReplaceAll(strings.ToLower(requestBody.Title), " ", "-")
+	article.Slug = helpers.CreateSlug(requestBody.Title)
 	article.Title = requestBody.Title
 	article.Body = requestBody.Body
 
-	token := c.Locals("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-
-	article.UserId = uint(claims["user_id"].(float64))
+	article.UserId = helpers.AuthUserId(c)
 
 	if result := database.DB.Create(&article); result.Error != nil {
 		fmt.Println(result.Error)
@@ -123,7 +119,15 @@ func UpdateArticle(c *fiber.Ctx) error {
 			})
 	}
 
-	article.Slug = strings.ReplaceAll(strings.ToLower(requestBody.Title), " ", "-")
+	if article.UserId != helpers.AuthUserId(c) {
+		return c.Status(fiber.StatusForbidden).
+			JSON(fiber.Map{
+				"message": "Unauthorized request.",
+				"data":    nil,
+			})
+	}
+
+	article.Slug = helpers.CreateSlug(requestBody.Title)
 	article.Title = requestBody.Title
 	article.Body = requestBody.Body
 
@@ -152,6 +156,14 @@ func DeleteArticle(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).
 			JSON(fiber.Map{
 				"message": "Article not found.",
+				"data":    nil,
+			})
+	}
+
+	if article.UserId != helpers.AuthUserId(c) {
+		return c.Status(fiber.StatusForbidden).
+			JSON(fiber.Map{
+				"message": "Unauthorized request.",
 				"data":    nil,
 			})
 	}

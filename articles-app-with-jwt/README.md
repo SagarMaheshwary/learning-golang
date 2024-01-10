@@ -1,4 +1,4 @@
-# ARTICLES APP
+# ARTICLES APP WITH JWT
 
 Articles CRUD with jwt authentication build using Fiber, GORM, and PostgreSQL database.
 
