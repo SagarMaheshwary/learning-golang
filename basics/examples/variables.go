@@ -1,11 +1,11 @@
-package main
+package examples
 
 import (
 	"fmt"
 	"strconv"
 )
 
-func main() {
+func Variables() {
 	//STRING
 
 	//Declaring a variable
@@ -18,6 +18,7 @@ func main() {
 	var name string = "John Doe"
 
 	//Shorthand for initializating a variable where type will be inferred
+	//(This syntax is commonly used to declare variables unless you are required to specify a type for readability)
 	anotherName := "Jane Doe"
 
 	//Constants (cannot reassign value afterwards, can only be declared with const keyword)
