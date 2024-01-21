@@ -25,30 +25,30 @@ type JWTConfig struct {
 
 func GetAppConfig() *AppConfig {
 	return &AppConfig{
-		AppPort: Get("APP_PORT", "8000"),
+		AppPort: get("APP_PORT", "8000"),
 	}
 }
 
 func GetDBConfig() *DBConfig {
 	return &DBConfig{
-		Host:     Get("DB_HOST", "localhost"),
-		Port:     Get("DB_PORT", "5432"),
-		Username: Get("DB_USERNAME", "postgres"),
-		Password: Get("DB_PASSWORD", "password"),
-		Database: Get("DB_DATABASE", "articles_app"),
-		SSLMode:  Get("DB_SSLMODE", "disable"),
-		TimeZone: Get("DB_TIMEZONE", "UTC"),
+		Host:     get("DB_HOST", "localhost"),
+		Port:     get("DB_PORT", "5432"),
+		Username: get("DB_USERNAME", "postgres"),
+		Password: get("DB_PASSWORD", "password"),
+		Database: get("DB_DATABASE", "articles_app"),
+		SSLMode:  get("DB_SSLMODE", "disable"),
+		TimeZone: get("DB_TIMEZONE", "UTC"),
 	}
 }
 
 func GetJWTConfig() *JWTConfig {
 	return &JWTConfig{
-		Secret: Get("JWT_SECRET", "secret"),
-		Expiry: Get("JWT_EXPIRY", ""), // @TODO: use expiry from ENV
+		Secret: get("JWT_SECRET", "secret"),
+		Expiry: get("JWT_EXPIRY", ""), // @TODO: use expiry from ENV
 	}
 }
 
-func Get(key string, defaultVal string) string {
+func get(key string, defaultVal string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
 	}
