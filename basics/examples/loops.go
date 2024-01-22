@@ -1,6 +1,8 @@
 package examples
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func Loops() {
 	//FOR LOOP
@@ -40,5 +42,30 @@ func Loops() {
 		}
 
 		fmt.Println("COUNTER FOR LOOP WITHOUT CONDITION", j)
+	}
+
+	//FOR RANGE
+
+	//In Golang, the for range loop is a convenient and concise way to iterate over elements
+	//in various data structures.
+
+	//ARRAY (OR SLICE)
+
+	names := [3]string{"John", "Jane", "Joe"}
+
+	for index, value := range names {
+		fmt.Printf("FOR...RANGE ARRAY INDEX: %v, VALUE: %v\n", index, value)
+	}
+
+	//MAP
+
+	user := map[string]string{
+		"id":    "1",
+		"name":  "Daniel",
+		"Email": "daniel@gmail.com",
+	}
+
+	for key, value := range user {
+		fmt.Printf("FOR...RANGE MAP KEY: %v, VALUE: %v\n", key, value)
 	}
 }

@@ -5,9 +5,11 @@ import (
 	"slices"
 )
 
-func ArraysAndSlices() {
-	//ARRAYS arrays in golang are fixed sized.
-	//Since they are fixed size so all the array values are stored sequentially in the memory.
+func ArraysSlicesAndMaps() {
+	//ARRAYS
+
+	//Arrays in golang are fixed sized. Since they are fixed size so all the array values are stored
+	//sequentially in the memory.
 
 	var names [3]string //declaring an array of string values.
 
@@ -20,13 +22,16 @@ func ArraysAndSlices() {
 	ages := [3]int{1, 2, 3}       //Initializing values
 	moreAges := [...]int{1, 2, 3} //we can also let the compiler infer the array length with "..."
 
-	//SLICES, An array has a fixed size. A slice, on the other hand, is a dynamically-sized, flexible
+	//SLICES
+
+	//An array has a fixed size. A slice, on the other hand, is a dynamically-sized, flexible
 	//view into the elements of an array. In practice, slices are much more common than arrays.
 
 	//Declaring slice is similar to an array expect for defining a size.
 	var stocks []int
 
 	prices := []int{1, 2, 3} //Initializing a slice
+
 	//NOTE: When adding an element to the slice, the underlying array will be assigned a new memory location.
 	prices = append(prices, 4)           //Adding an element to a slice
 	prices = slices.Delete(prices, 0, 1) //Deletes "1" from the slice
@@ -47,6 +52,30 @@ func ArraysAndSlices() {
 	myNames := names[:]   //All elemnts, prints: ["Daniel", "John", "Jane"]
 	myNames1 := names[1:] //All elements after 1 index, prints: ["John", "Jane"]
 	myNames2 := names[:1] //All elements till 1 index, prints: ["Daniel"]
+
+	//MAPS
+
+	//A map is a built-in data structure that provides an unordered collection of key-value pairs. (similar to objects in Javascript)
+
+	//Declaring a map
+	// var user map[string]string
+
+	//Initializing a map
+	user := map[string]string{ //Syntax: map[keyType]valueType
+		"id":    "1",
+		"name":  "Daniel",
+		"Email": "daniel@gmail.com",
+	}
+
+	user["id"] = "2" //Updating a key
+
+	fmt.Println("User map's id key", user["id"]) //Accessing a key
+
+	delete(user, "id") //Deleting a key
+
+	//We would expect an error if we access a key that does not exist but that not
+	//true in Golang. We will actually get the default value of the map type.
+	fmt.Println("User map's deleted id key", user["id"]) //prints: "" (empty string)
 
 	//-------------------------------------------------------------------------------------------------------------------------------------------
 	//Ignore this line as it's only written for compiler to silent it's "unused vars" error
