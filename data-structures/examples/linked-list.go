@@ -1,16 +1,14 @@
-package main
+package examples
 
 import "fmt"
 
-func main() {
-	fmt.Println("Hello")
+func LinkedList() {
+	ll := List{}
 
-	ll := new(LinkedList)
+	ll.insert("A")
+	ll.insert("B")
 
-	ll.Insert("A")
-	ll.Insert("B")
-
-	ll.Display()
+	ll.display()
 }
 
 type Node struct {
@@ -18,12 +16,11 @@ type Node struct {
 	next  *Node
 }
 
-type LinkedList struct {
+type List struct {
 	node *Node
-	size int
 }
 
-func (ll *LinkedList) Insert(val string) {
+func (ll *List) insert(val string) {
 	if ll.node == nil {
 		ll.node = &Node{
 			value: val,
@@ -45,7 +42,7 @@ func (ll *LinkedList) Insert(val string) {
 	}
 }
 
-func (ll *LinkedList) Display() {
+func (ll *List) display() {
 	node := ll.node
 
 	for node != nil {
