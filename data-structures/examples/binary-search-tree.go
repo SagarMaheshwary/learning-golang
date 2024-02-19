@@ -5,8 +5,8 @@ import (
 	"slices"
 )
 
-func BinaryTree() {
-	tree := Tree{Root: TreeNode{Val: 4}}
+func BinarySearchTree() {
+	tree := BSTTree{Root: BSTNode{Val: 4}}
 
 	tree.insert(2, &tree.Root)
 	tree.insert(7, &tree.Root)
@@ -19,38 +19,19 @@ func BinaryTree() {
 	dfsPrint(tree.Root)
 	bfsPrint(tree.Root)
 	invertTree(&tree.Root)
-
-	// fmt.Println("-----------")
-	// bfsPrint(tree.Root)
-
-	// arr := []int{4, 2, 7, 1, 3, 6, 9, 11, 5, 7, 8, 6, 3}
-
-	// for i := 1; i < len(arr); i += 2 {
-
-	// 	fmt.Println("LEFT NODE", arr[i])
-
-	// 	if !slices.Contains(arr, i+1) {
-	// 		break
-	// 	}
-
-	// 	fmt.Println("RIGHT NODE", arr[i+1])
-	// 	fmt.Println("")
-	// }
-
-	// fmt.Println(tree.Root.Left.Val)
 }
 
-type TreeNode struct {
+type BSTNode struct {
 	Val   int
-	Left  *TreeNode
-	Right *TreeNode
+	Left  *BSTNode
+	Right *BSTNode
 }
 
-type Tree struct {
-	Root TreeNode
+type BSTTree struct {
+	Root BSTNode
 }
 
-func (t *Tree) insert(val int, root *TreeNode) {
+func (t *BSTTree) insert(val int, root *BSTNode) {
 	if root.Val < val {
 		t.insertRight(val, root)
 	} else {
@@ -58,28 +39,28 @@ func (t *Tree) insert(val int, root *TreeNode) {
 	}
 }
 
-func (t *Tree) insertRight(val int, node *TreeNode) {
+func (t *BSTTree) insertRight(val int, node *BSTNode) {
 	if node.Right != nil {
 		t.insert(val, node.Right)
 	} else {
-		node.Right = &TreeNode{Val: val}
+		node.Right = &BSTNode{Val: val}
 	}
 }
 
-func (t *Tree) insertLeft(val int, node *TreeNode) {
+func (t *BSTTree) insertLeft(val int, node *BSTNode) {
 	if node.Left != nil {
 		t.insert(val, node.Left)
 	} else {
-		node.Left = &TreeNode{Val: val}
+		node.Left = &BSTNode{Val: val}
 	}
 }
 
-func invertTree(root *TreeNode) *TreeNode {
+func invertTree(root *BSTNode) *BSTNode {
 	if root == nil {
 		return root
 	}
 
-	nodes := []*TreeNode{root}
+	nodes := []*BSTNode{root}
 
 	for len(nodes) > 0 {
 		node := nodes[0]
@@ -101,8 +82,8 @@ func invertTree(root *TreeNode) *TreeNode {
 	return root
 }
 
-func bfsPrint(root TreeNode) {
-	nodes := []TreeNode{root}
+func bfsPrint(root BSTNode) {
+	nodes := []BSTNode{root}
 
 	for len(nodes) > 0 {
 		node := nodes[0]
@@ -121,8 +102,8 @@ func bfsPrint(root TreeNode) {
 
 }
 
-func dfsPrint(root TreeNode) {
-	nodes := []TreeNode{root}
+func dfsPrint(root BSTNode) {
+	nodes := []BSTNode{root}
 
 	for len(nodes) > 0 {
 		nodesCount := len(nodes)
@@ -142,8 +123,8 @@ func dfsPrint(root TreeNode) {
 	}
 }
 
-func countNodes(root TreeNode) int {
-	nodes := []TreeNode{root}
+func countNodes(root BSTNode) int {
+	nodes := []BSTNode{root}
 
 	visited := map[int]bool{}
 	count := 0
